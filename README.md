@@ -18,10 +18,12 @@ var input = {
 var validators = {
     name: [
         {
-            validate: function (value) {
+            validate: function (value, sourceObject) {
                 return typeof value === 'string';
             },
-            message: 'Name must be a string'
+            message: function (value, fieldName) {
+                return 'Name must be a string';
+            }
         }
     ]
 };
