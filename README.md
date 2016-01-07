@@ -1,6 +1,8 @@
-# Install
+# Installation
 
 `npm install ezv`
+
+
 
 ### Basic Usage
 
@@ -31,6 +33,27 @@ errors === [
   }
 ]
 ```
+
+### Validator options
+
+`validate (value, sourceObject)`
+- `value` is the value being validated
+- `sourceObject` is the object which was provided as ezv's first parameter
+
+
+`message (value, fieldName)`
+- can be a `string` or `function`
+- `value` is the value being validated
+- `fieldName` is the property name of the value
+
+`breakOnFail`
+- `boolean` which defaults to `false`
+- when `true` the validation pipeline will stop after the first encountered failure
+
+`breakOnSuccess`
+- `boolean` which defaults to `false`
+- when `true` the validation pipeline will stop after the first encountered success
+
 
 ### Examples:
 
