@@ -2,6 +2,35 @@
 
 `npm install ezv`
 
+### Basic Usage
+
+```
+
+var input = {
+    name: 123
+};
+
+var validators = {
+    name: [
+        {
+            validate: function (value) {
+                return typeof value === 'string';
+            },
+            message: 'Name must be a string'
+        }
+    ]
+};
+
+var errors = ezv(input, validators);
+
+errors === [
+  {
+    field: 'name',
+    message: 'Name must be a string',
+    value: '123'
+  }
+]
+```
 
 ### Examples:
 
