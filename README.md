@@ -46,7 +46,6 @@ errors === [
 - the object you want to validate
 
 `validatorsObject`
-- the validators to apply to the `sourceObject`
 - each property should match an associated field on the `sourceObject`, and provide an array value of `[validator options]`
 
 
@@ -162,50 +161,50 @@ errors === [{
 }]
 ```
 
-#### Is required
-```
-const data = {
-  name: 123,
-};
-
-const validators = {
-  name: [
-    {
-      validate (value) {
-          return value !== undefined;   // Check for value existence
-      },
-      message: 'Field is required',
-      breakOnFail: true                    // Break out of the pipeline because any subsequent validators are irrelevant
-    }
-  ]
-}
-```
 
 
-#### Is optional
-```
-const data = {
-
-};
-
-const validators = {
-  name: [
-    {
-      validate (value) {
-        return value === undefined;  // Return true when value is not found
-      },
-      breakOnSuccess: true           // Break out of the pipeline because any subsequent validators are irrelevant.
-                                     // If 'value' exists, no error will be returned for THIS validator.
-    }
-  ]
-}
-```
-
-### Helpers
+### Creating Helpers
 
 #### isString
 
 ```
+function isString (min, max) {
+    return {
+        validate (value, source) {
+
+            if (!_.isString(value)) {
+                return false;
+            }
+
+            if (min && max) {
+                return min <= value.length && value.length <= max;
+            }
+
+            if (min) {
+                return min <= value.length;
+            }
+
+            return true;
+        },
+        message (value) {
+
+            if (!_.isString(value)) {
+                return 'Must be a string';
+            }
+
+            if (min && max) {
+                return `Must be between ${min} and ${max} characters`;
+            }
+
+            if (min) {
+                return `Must be at least ${min} characters`;
+            }
+
+            return 'Must be a string';
+        }
+    };
+}
+
 validators = {
     name: [
         isString(),       // value is of string type
@@ -215,39 +214,49 @@ validators = {
 }
 ```
 
-#### isNumber
-
-```
-validators = {
-    name: [
-        isNumber(),       // value is of number type
-        isNumber(1),      // value is number, and min value is 1
-        isNumber(1, 5)    // value is number, and between 1-5 (inclusive) value.
-    ]
-}
-```
-
-#### isArray
-
-```
-validators = {
-    name: [
-        isArray(),       // value is of array type
-        isArray(1),      // value is array, and min element length is 1
-        isArray(1, 5)    // value is array, and between 1-5 (inclusive) element length.
-    ]
-}
-```
-
 #### isOptional
 
 ```
+
+function isOptional () {
+    return {
+        validate (value) {
+            return value === undefined;  // Return true when value is not found
+        },
+        breakOnSuccess: true           // Break out of the pipeline because any subsequent validators are irrelevant.
+                                 // If 'value' exists, no error will be returned for THIS validator.
+    }
+
+}
+
 validators = {
     name: [
         isOptional(),    // If value is undefined, break out of pipeline, do not return errors.
         isString(2)      // When value is something, ensure it is a string of at least 2 characters.
     ]
 }
+```
+
+#### Is required
+```
+
+function isRequired () {
+    return {
+        validate (value) {
+            return value !== undefined;  // Return true when value is not found
+        },
+        breakOnFail: true           // Break out of the pipeline because any subsequent validators are irrelevant.
+                                 // If 'value' exists, no error will be returned for THIS validator.
+    }
+}
+
+validators = {
+    name: [
+        isRequired(),    // If value is undefined, break out of pipeline, do not return errors.
+        isString(2)      // When value is something, ensure it is a string of at least 2 characters.
+    ]
+}
+
 ```
 
 ### Tips
