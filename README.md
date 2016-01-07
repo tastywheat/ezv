@@ -1,3 +1,6 @@
+`ezv` is a minimal, but highly composable validation library.
+
+
 # Installation
 
 `npm install ezv`
