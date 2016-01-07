@@ -146,8 +146,8 @@ const validators = {
         validate (value) {
           return _.isString(value)
         },
-        message (value) {
-          return `${value} must be a string`;    // The field property will be 'address.postalCode'
+        message (value, fieldName) {
+          return `${fieldName} must be a string, found: ${value}`;    // The field property will be 'address.postalCode'
         }
       }
     ]
