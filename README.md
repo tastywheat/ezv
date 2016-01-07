@@ -37,6 +37,17 @@ errors === [
 ]
 ```
 
+
+`ezv(sourceObject, validatorsObject)`
+
+`sourceObject`
+- the object you want to validate
+
+`validatorsObject`
+- the validators to apply to the `sourceObject`
+- each property should match an associated field on the `sourceObject`, and provide an array value of `[validator options]`
+
+
 ### Validator options
 
 `validate (value, sourceObject)`
