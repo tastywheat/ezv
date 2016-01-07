@@ -1,5 +1,4 @@
 var assert = require('assert');
-var _ = require('lodash');
 var ezv = require('../index');
 
 describe('ezv', function () {
@@ -14,7 +13,7 @@ describe('ezv', function () {
             name: [
                 {
                     validate: function (value) {
-                        return _.isString(value);
+                        return typeof value === 'string';
                     },
                     message: 'Name must be a string'
                 }

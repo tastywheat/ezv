@@ -1,19 +1,21 @@
-var _ = require('lodash');
+var isPlainObject = require('lodash.isplainobject');
+var reduce = require('lodash.reduce');
+
 
 function validate (source, validatorMapping, path) {
     var _path = path || [];
 
-    if (!_.isPlainObject(source)) { throw new Error('@source must be a plain object') }
-    if (!_.isPlainObject(validatorMapping)) { throw new Error('@validatorMapping must be a plain object') }
+    if (!isPlainObject(source)) { throw new Error('@source must be a plain object') }
+    if (!isPlainObject(validatorMapping)) { throw new Error('@validatorMapping must be a plain object') }
 
-    return _.reduce(validatorMapping, function (errors, validators, fieldName) {
+    return reduce(validatorMapping, function (errors, validators, fieldName) {
 
         if (!validators) { return errors; }
 
         var valueToValidate = source[fieldName];
 
         // Validators have nested childre, run validate on them
-        if (_.isPlainObject(validators)) {
+        if (isPlainObject(validators)) {
             return errors.concat(
                 validate(valueToValidate, validators, _path.concat(fieldName))
             );
@@ -22,7 +24,7 @@ function validate (source, validatorMapping, path) {
 
         var _break = false;
 
-        return _.reduce(validators, function (fieldErrors, validator) {
+        return reduce(validators, function (fieldErrors, validator) {
 
             if (typeof validator.validate !== 'function') { throw new Error('validator.validate must be a function') }
 
