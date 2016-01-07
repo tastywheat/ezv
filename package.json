@@ -1,0 +1,19 @@
+{
+  "name": "ezv",
+  "version": "1.0.0",
+  "description": "Validation made easy",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests"
+  },
+  "keywords": [
+    "validation",
+    "validate",
+    "validator"
+  ],
+  "author": "brian law",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
