@@ -1,11 +1,11 @@
 {
   "name": "ezv",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Validation made easy",
   "main": "index.js",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/tastywheat/ezv"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tastywheat/ezv"
   },
   "scripts": {
     "test": "mocha tests"
