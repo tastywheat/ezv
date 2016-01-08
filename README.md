@@ -63,11 +63,11 @@ errors === [
 
 `breakOnFail`
 - `boolean` which defaults to `false`
-- when `true` the validation pipeline will stop after the first encountered failure
+- when `true` the validation pipeline will stop `validate` failure
 
 `breakOnSuccess`
 - `boolean` which defaults to `false`
-- when `true` the validation pipeline will stop after the first encountered success
+- when `true` the validation pipeline will stop on `validate` success
 
 
 ### Examples:
