@@ -40,13 +40,11 @@ errors === [
 ```
 
 
-`ezv(sourceObject, validatorsObject)`
+`ezv(sourceObject, validatorMapping)`
 
-`sourceObject`
-- the object you want to validate
+- `sourceObject` the object you want to validate
 
-`validatorsObject`
-- each property should match an associated field on the `sourceObject`, and provide an array value of `[validator options]`
+- `validatorMapping` each property should match an associated field on the `sourceObject`, and provide an array value of `[validator options]`
 
 
 ### Validator options
@@ -70,15 +68,15 @@ errors === [
 - when `true` the validation pipeline will stop on `validate` success
 
 
-### Examples:
+### Example validators:
 
 #### Is string
 ```
-const data = {
+var data = {
   name: 123
 };
 
-const validators = {
+var validators = {
   name: [
     {
       validate (value) {
@@ -92,12 +90,12 @@ const validators = {
 
 #### Access source object
 ```
-const data = {
+var data = {
   name: 123,
   foobar: 9999
 };
 
-const validators = {
+var validators = {
   name: [
     {
       validate (value, source) {             // Second argument is 'data'
@@ -112,11 +110,11 @@ const validators = {
 
 #### Custom message
 ```
-const data = {
+var data = {
   name: 123
 };
 
-const validators = {
+var validators = {
   name: [
     {
       validate (value) {
@@ -132,14 +130,14 @@ const validators = {
 
 #### Nested properties
 ```
-const data = {
+var data = {
   name: 123,
   address: {
     postalCode: 123
   }
 };
 
-const validators = {
+var validators = {
   address: {
     postalCode: [                                // Nest a set of validators under the parent
       {
@@ -259,9 +257,8 @@ validators = {
 
 ```
 
-### Tips
 
-#### Use custom message instead of helper message
+#### Override a message from a helper
 
 ```
 validators = {
