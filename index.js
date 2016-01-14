@@ -34,29 +34,46 @@ function validate (source, validatorMapping, path) {
 
             var result = validator.validate(valueToValidate, source);
 
+            var isFailure = (result === false || typeof result === 'string');
+
+            function getMessage () {
+
+                if (typeof result === 'string') {
+                    return result;
+                }
+
+                // Allow override of error message result
+                if (validator.message) {
+                    return (typeof validator.message === 'string') ?
+                        validator.message :
+                        validator.message(valueToValidate, fieldName);
+
+                }
+            }
+
             // Optional fields will use a breakOnSuccess
             if (result === true && validator.breakOnSuccess === true) {
                 _break = true;
                 return fieldErrors;
             }
 
+            var message = getMessage();
 
-            if (result === false) {
+
+            if (isFailure) {
 
                 _break = validator.breakOnFail;
 
                 // Message is not provided, ignore any errors
                 // Some validators do not have messages: breakOnSuccess, nested validators
-                if (!validator.message) {
+                if (!message) {
                     return fieldErrors;
                 }
 
                 return fieldErrors.concat({
                     field: _path.concat(fieldName).join('.'),
                     value: valueToValidate,
-                    message: (typeof validator.message === 'string') ?
-                        validator.message :
-                        validator.message(valueToValidate, fieldName)
+                    message: message
                 });
             }
 

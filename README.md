@@ -19,10 +19,9 @@ var validators = {
     name: [
         {
             validate: function (value, sourceObject) {
-                return typeof value === 'string';
-            },
-            message: function (value, fieldName) {
-                return 'Name must be a string';
+                if (typeof value === 'string') {
+                    return 'Must be a string';
+                }
             }
         }
     ]
@@ -41,20 +40,27 @@ errors === [
 
 
 `ezv(sourceObject, validatorMapping)`
+- returns an array of `validation error` objects
 
 - `sourceObject` the object you want to validate
 
 - `validatorMapping` each property should match an associated field on the `sourceObject`, and provide an array value of `[validator options]`
 
+`validation errors`
+- `field`
+- `message`
+- `value`
 
 ### Validator options
 
 `validate (value, sourceObject)`
 - `value` is the value being validated
 - `sourceObject` is the object which was provided as ezv's first parameter
+- pass values: `undefined` and `true`
+- fail values: `string` and `false`
+- returning a `string` will be a validation failure, and the string will be used as the error message. If a string is returned, and a `message` propery exists, the message will take priority.
 
-
-`message (value, fieldName)`
+`message (value, fieldName) optional`
 - can be a `string` or `function`
 - `value` is the value being validated
 - `fieldName` is the property name of the value
