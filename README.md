@@ -32,7 +32,7 @@ var errors = ezv(input, validators);
 errors === [
   {
     field: 'name',
-    message: 'Name must be a string',
+    message: 'Must be a string',
     value: '123'
   }
 ]
