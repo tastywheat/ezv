@@ -105,8 +105,6 @@ describe('ezv', function () {
         assert(errors.length > 0);
     });
 
-
-
     it('should error when string is returned from validate', function () {
 
         var input = {
