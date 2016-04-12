@@ -1,4 +1,4 @@
-`ezv` is a minimal, but highly composable validation library.
+`ezv2` is a minimal, but highly composable validation library.
 
 
 # Installation
@@ -39,26 +39,19 @@ errors === [
 
 `ezv(sourceObject, schema)`
 - returns an array of `validation error` objects
-
 - `sourceObject` the object you want to validate
-
 - `schema` each property should match an associated field on the `sourceObject`, and provide a function which returns a string as an error message`
 
-`validation errors`
+An error contains these fields:
 - `field`
 - `message`
 - `value`
 
-### Validator options
-
-`validation function`
+### validate function
 - signature `(value, sourceObject)`
 - `value` is the value being validated
 - `sourceObject` is the object which was provided as ezv's first parameter
-- pass values: `undefined`
-- fail values: `string` and `array`
-    - returning a `string` will be a validation failure, and the string will be used as the error message.
-    - returning an array is only applicable when doing nested validation, see *nested validation* below
+- returning a `string` will be a validation failure, and the string will be used as the error message.
 
 
 
@@ -170,8 +163,8 @@ var personSchema = {
 
 var accountSchema = {
     friends (value) {
-        if (!_.isString(value)) {
-            return 'name must be a string';
+        if (!_.isArray(value)) {
+            return 'name must be an array';
         }
 
         return ezv2(value, personSchema);      // <------ call ezv2 on another schema
