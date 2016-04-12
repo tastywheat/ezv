@@ -1,6 +1,6 @@
 var isPlainObject = require('lodash.isplainobject');
 var reduce = require('lodash.reduce');
-
+var ezv2 = require('./src/v2');
 
 function validate (source, validatorMapping, path) {
     var _path = path || [];
@@ -83,5 +83,7 @@ function validate (source, validatorMapping, path) {
 
     }, []);
 }
+
+validate.v2 = ezv2;
 
 module.exports = validate;

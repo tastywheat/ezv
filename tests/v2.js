@@ -1,6 +1,6 @@
 var assert = require('assert');
 var isPlainObject = require('lodash.isplainobject');
-var ezv2 = require('../src/v2');
+var ezv2 = require('../index').v2;
 
 describe('ezv2', function () {
 
