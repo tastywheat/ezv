@@ -118,7 +118,7 @@ errors === [
 var data = {
     name: 123,
     address: {
-        postalCode: 123
+        postalCode: '123'
     }
 };
 
