@@ -1,6 +1,4 @@
-[v1 documentation](https://github.com/tastywheat/ezv/blob/master/docs/v1/README.md)
-
-`ezv` is a minimal, but highly composable validation library.
+`ezv2` is a minimal, but highly composable validation library.
 
 
 # Installation
@@ -20,7 +18,7 @@ var input = {
 
 var schema = {
     name (value, sourceObject) {
-        if (typeof value === 'string') {
+        if (typeof value !== 'string') {
             return 'Must be a string';
         }
     }
@@ -67,7 +65,7 @@ var data = {
 
 var schema = {
     name (value, sourceObject) {
-        if (typeof value === 'string') {
+        if (typeof value !== 'string') {
             return 'Must be a string';
         }
     }
