@@ -2,13 +2,17 @@ var isPlainObject = require('lodash.isplainobject');
 var reduce = require('lodash.reduce');
 
 
-function validate (source, validatorMapping) {
-
-    // if (Array.isArray(source)) {
-        
-    // }
+function validate (source, schema, fieldPrefix) {
+    var _fieldPrefix = (fieldPrefix + '.') || '';
     
-    return reduce(validatorMapping, function (errors, validator, fieldName) {
+    if (Array.isArray(source)) {
+        return reduce(source, function (errors, item, index) {
+            var itemErrors = validate(item, schema, index);
+            return errors.concat(itemErrors);
+        }, []);   
+    }
+    
+    return reduce(schema, function (errors, validator, fieldName) {
 
         var valueToValidate = source[fieldName];
 
@@ -20,7 +24,7 @@ function validate (source, validatorMapping) {
 
         if (typeof result === 'string') {
             return errors.concat({
-                field: fieldName,
+                field: _fieldPrefix + fieldName,
                 value: valueToValidate,
                 message: result
             });
@@ -30,6 +34,7 @@ function validate (source, validatorMapping) {
 
     }, []);
 }
+
 
 
 

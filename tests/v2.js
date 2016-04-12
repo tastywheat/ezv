@@ -109,7 +109,52 @@ describe('ezv2', function () {
         });
         
         
-        
+        it('should handle arrays of objects', function () {
+            var input = {
+                friends: [
+                    { name: 'brian' },
+                    { name: 123 },
+                    { name: false }
+                ]   
+            }
+            var personSchema = {
+                friends: function (value) {
+                    return ezv2(value, friendSchema);
+                }
+            }
+            
+            var friendSchema = {
+                name: function (value) {
+                    if (typeof value !== 'string') {
+                        return 'name must be a string'
+                    }
+                }
+            }
+            
+            errors = ezv2(input, personSchema);
+            console.log(errors)
+            assert(errors.length === 2);
+       }) 
     });
 
+    describe('arrays', function () {
+       it('should handle arrays of objects', function () {
+           var input = [
+               { name: 'brian' },
+               { name: 123 },
+               { name: false },
+           ]
+            
+            var schema = {
+                name: function (value) {
+                    if (typeof value !== 'string') {
+                        return 'name must be a string'
+                    }
+                }
+            }
+            
+            errors = ezv2(input, schema);
+            assert(errors.length === 2);
+       }) 
+    });
 });
