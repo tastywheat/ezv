@@ -34,7 +34,7 @@ errors === [
     {
         field: 'name',
         message: 'Must be a string',
-        value: '123'
+        value: 123
     }
 ]
 ```
