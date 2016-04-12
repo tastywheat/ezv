@@ -4,95 +4,45 @@ var reduce = require('lodash.reduce');
 
 function validate (source, validatorMapping) {
 
-    // process each field
-    return reduce(validatorMapping, function (errors, validators, fieldName) {
-
-        if (!validators) { return errors; }
+    // if (Array.isArray(source)) {
+        
+    // }
+    
+    return reduce(validatorMapping, function (errors, validator, fieldName) {
 
         var valueToValidate = source[fieldName];
 
-        var _break = false;
+        var result = validator(valueToValidate, source);
 
-        // run field validators against field value
-        return reduce(validators, function (fieldErrors, validator) {
+        if (Array.isArray(result)) {
+            return errors.concat(result);
+        }
 
-            if (typeof validator.validate !== 'function') { throw new Error('validator.validate must be a function') }
-
-            if (_break) { return fieldErrors; }
-
-            var result = validator.validate(valueToValidate, source);
-
-            var isFailure = (
-                result === false ||
-                typeof result === 'string' ||
-                Array.isArray(result)
-            );
-
-            var isSuccess = !isFailure;
-
-            function getMessage () {
-
-                if (Array.isArray(result)) {
-                    return result;
-                }
-
-                if (typeof result === 'string') {
-                    return result;
-                }
-
-                // Allow override of error message result
-                if (validator.message) {
-                    return (typeof validator.message === 'string') ?
-                        validator.message :
-                        validator.message(valueToValidate, fieldName);
-
-                }
-            }
-
-
-            if (validator.breakOnSuccess) {
-
-                if (isSuccess) {
-                    _break = true;
-                }
-
-                // Errors are never added when breaking on success
-                return fieldErrors;
-            }
-
-
-            if (isFailure) {
-
-                var message = getMessage();
-
-                _break = validator.breakOnFail;
-
-                if (Array.isArray(message)) {
-                    return fieldErrors.concat(message);
-                } else {
-                    return fieldErrors.concat({
-                        field: fieldName,
-                        value: valueToValidate,
-                        message: message
-                    });
-                }
-
-            }
-
-            return fieldErrors;
-
-        }, errors);
+        if (typeof result === 'string') {
+            return errors.concat({
+                field: fieldName,
+                value: valueToValidate,
+                message: result
+            });
+        }
+    
+        return errors;
 
     }, []);
 }
 
 
-function validate2 (source, validatorMapping) {
-
-}
 
 /*
 
+list = [1,2,3]
+function schema (n) {
+    if (typeof n !== 'number') {
+        return 'must be a number'
+    }
+}
+
+ezv(list, schema)
 
 
 
@@ -103,9 +53,12 @@ var data = {
     },
     friends: [
         { name: 'wheat' },
-        { name: 'tasty' },
+        { namez: 'tasty' },
+        { name: 'brian' },
         123
-    ]
+    ],
+    
+    
 }
 
 var personValidator = {
@@ -124,20 +77,56 @@ var fruitValidator = {
 }
 
 
-var validators = {
-    foobar: [
-        function (value) {
-            this.breakOnFail = true;
-            this.message = '';
+// change message based on value, without duplicating logic
+// friends.0.name
+// friends.4.address.1.street
 
-            return 'foo' === foo // bool
-            return ezv(value, otherschema) // array
+var validators = {
+    
+    foo (value) {
+        if (!isNumber(value)) {
+            return 'must be an array'
         }
-    ]
+    }
+    friends (value) {
+        
+        if (!isArray(value)) {
+            return 'must be an array'
+        }
+        
+        return ezv(thing, schema) // thing as array 
+    }
+    
+    friends (value) {
+        return ezv(thing, schema) // thing as object
+    }
+    
+    friends: [
+        function () {
+            
+        } 
+    ],
+    bar: [
+        function (value) {
+            
+            return ezv(value, otherschema) // array
+            
+            return {
+                pass: false,
+                message:
+                break:
+            }
+        }
+    ],
     fruit: [
         isObject(),
         function (value) {
             return ezv(value, fruitValidator);
+        },
+        {
+            validate () {
+                
+            }
         }
     ],
     friends: [
