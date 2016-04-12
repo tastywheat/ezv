@@ -1,7 +1,7 @@
 [v1 documentation](https://github.com/tastywheat/ezv/blob/master/docs/v1/README.md)
 
 
-`ezv` is a minimal, but highly composable validation library.
+`ezv` is a minimal, but highly composable JSON validation library.
 
 
 # Installation
