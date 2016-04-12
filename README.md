@@ -74,6 +74,16 @@ var schema = {
     }
 };
 
+errors = ezv(data, schema);
+
+errors === [
+  {
+    "field": "name",
+    "value": 123,
+    "message": "Must be a string"
+  }
+]
+
 ```
 
 #### Access source object
@@ -90,6 +100,16 @@ var schema = {
         }
     }
 }
+
+errors = ezv(data, schema);
+
+errors === [
+  {
+    "field": "foo",
+    "value": 123,
+    "message": "foo must be more than bar"
+  }
+]
 ```
 
 
@@ -120,7 +140,15 @@ var contactSchema = {
     }
 }
 
-ezv2(data, contactSchema)
+errors = ezv2(data, contactSchema)
+
+errors === [
+  {
+    "field": "address.postalCode",
+    "value": "123",
+    "message": "postalCode must be a number"
+  }
+]
 
 ```
 
@@ -142,7 +170,20 @@ var schema = {
     }
 }
 
-ezv2(data, schema)
+errors = ezv2(data, schema)
+
+errors === [
+  {
+    "field": "1.name",
+    "value": 123,
+    "message": "name must be a string"
+  },
+  {
+    "field": "2.name",
+    "value": false,
+    "message": "name must be a string"
+  }
+]
 
 ```
 
@@ -175,7 +216,21 @@ var accountSchema = {
 }
 
 
-ezv2(data, accountSchema)
+errors = ezv2(data, accountSchema)
+
+errors === [
+  {
+    "field": "friends.1.name",
+    "value": 123,
+    "message": "name must be a string"
+  },
+  {
+    "field": "friends.2.name",
+    "value": false,
+    "message": "name must be a string"
+  }
+]
+
 ```
 
 
@@ -190,5 +245,28 @@ function schema (value) {               // <----- schema is a function now
     }
 }
 
-ezv2(data, schema)
+errors = ezv2(data, schema)
+
+errors === [
+  {
+    "field": 0,
+    "value": 1,
+    "message": "name must be a string"
+  },
+  {
+    "field": 1,
+    "value": 2,
+    "message": "name must be a string"
+  },
+  {
+    "field": 2,
+    "value": 3,
+    "message": "name must be a string"
+  },
+  {
+    "field": 3,
+    "value": 4,
+    "message": "name must be a string"
+  }
+]
 ```
