@@ -1,4 +1,7 @@
-`ezv2` is a minimal, but highly composable validation library.
+[v1 documentation](https://github.com/tastywheat/ezv/blob/master/docs/v1/README.md)
+
+
+`ezv` is a minimal, but highly composable validation library.
 
 
 # Installation
