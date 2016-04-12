@@ -20,7 +20,7 @@ function validate (source, schema, fieldPrefix) {
 function processScalar (source, schema) {
     return reduce(source, function (errors, item, index) {
 
-        var result = schema(item);
+        var result = schema(item, source);
 
         if (typeof result === 'string') {
             return errors.concat({
