@@ -18,7 +18,7 @@ var input = {
 
 var schema = {
     name (value, sourceObject) {
-        if (typeof value === 'string') {
+        if (typeof value !== 'string') {
             return 'Must be a string';
         }
     }
@@ -65,7 +65,7 @@ var data = {
 
 var schema = {
     name (value, sourceObject) {
-        if (typeof value === 'string') {
+        if (typeof value !== 'string') {
             return 'Must be a string';
         }
     }
