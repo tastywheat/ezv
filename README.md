@@ -136,7 +136,7 @@ var contactSchema = {
             return 'address must be an object';
         }
 
-        return ezv2(value, addressSchema);       // <-------- Call ezv2 with a child schema
+        return addressSchema;  // <-------- return child schema
     }
 }
 
@@ -211,7 +211,7 @@ var accountSchema = {
             return 'name must be an array';
         }
 
-        return ezv2(value, personSchema);      // <------ call ezv2 on another schema
+        return personSchema;    // <------ call ezv2 on another schema
     }
 }
 
