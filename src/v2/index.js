@@ -1,4 +1,5 @@
 var reduce = require('lodash.reduce');
+var isPlainObject = require('lodash.isPlainObject');
 var virtualFieldRegex = /^__.*/;
 
 function validate (source, schema, fieldPrefix) {
