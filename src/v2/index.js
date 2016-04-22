@@ -46,7 +46,7 @@ function processTop (source, schema, fieldPrefix) {
         var isVirtualField = virtualFieldRegex.test(fieldName);
 
         var result = isVirtualField
-            ? validator(source)
+            ? validator(source, source)
             : validator(valueToValidate, source);
 
         // process nested validation
