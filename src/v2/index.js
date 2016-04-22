@@ -1,4 +1,3 @@
-var isPlainObject = require('lodash.isplainobject');
 var reduce = require('lodash.reduce');
 
 
