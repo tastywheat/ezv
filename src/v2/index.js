@@ -2,7 +2,7 @@ var reduce = require('lodash.reduce');
 
 
 function validate (source, schema, fieldPrefix) {
-    var _fieldPrefix = fieldPrefix === undefined ? (fieldPrefix + '.') : '';
+    var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix + '.') : '';
 
 
     if (typeof schema === 'function') {
