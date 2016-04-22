@@ -1,5 +1,5 @@
 var reduce = require('lodash.reduce');
-
+var virtualFieldRegex = /^__.*/;
 
 function validate (source, schema, fieldPrefix) {
     var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix + '.') : '';
@@ -43,9 +43,11 @@ function processNested (source, schema) {
 function processTop (source, schema, fieldPrefix) {
     return reduce(schema, function (errors, validator, fieldName) {
 
-        var valueToValidate = source[fieldName];
+        var isVirtualField = virtualFieldRegex.test(fieldName);
 
-        var result = validator(valueToValidate, source);
+        var result = isVirtualField
+            ? validator(source)
+            : validator(valueToValidate, source);
 
         // process nested validation
         if (isSchema(result)) {
