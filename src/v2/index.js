@@ -47,7 +47,18 @@ function processTop (source, schema, fieldPrefix) {
 
         var result = validator(valueToValidate, source);
 
+        // process nested validation
+        if (isSchema(result)) {
+            var childErrors = validate(valueToValidate, result);
+            return childErrors.map(function (error) {
+                return Object.assign({}, error, {
+                    field: fieldName + '.' + error.field
+                });
+            })
+            .concat(errors);
+        }
 
+        // TODO: deprecate
         // result is an array when doing nested validation
         if (Array.isArray(result)) {
 
@@ -73,5 +84,16 @@ function processTop (source, schema, fieldPrefix) {
     }, []);
 }
 
+function isSchema (value) {
+    if (typeof value === 'function') {
+        return true;
+    }
+    if (isPlainObject(value)) {
+        return Object.keys(value)
+            .reduce(function (acc, fieldName) {
+                return acc && typeof value[fieldName] === 'function';
+            }, true);
+    }
+}
 
 module.exports = validate;

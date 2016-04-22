@@ -113,8 +113,39 @@ describe('ezv2', function () {
 
             errors = ezv2(input, personSchema);
             assert(errors.length === 2);
-        })
-    })
+        });
+    });
+    
+    describe('nested array of objects - returning schema', function () {
+
+        var personSchema = {
+            friends: function (value) {
+                return friendSchema;
+            }
+        }
+
+        var friendSchema = {
+            name: function (value) {
+                if (typeof value !== 'string') {
+                    return 'name must be a string'
+                }
+            }
+        }
+
+        it('should fail when name is not a string', function () {
+
+            var input = {
+                friends: [
+                    { name: 'brian' },
+                    { name: 123 },
+                    { name: false }
+                ]
+            }
+
+            errors = ezv2(input, personSchema);
+            assert(errors.length === 2);
+        });
+    });
 
     describe('array of objects', function () {
         it('should fail when name is not a string', function () {
@@ -136,6 +167,7 @@ describe('ezv2', function () {
             assert(errors.length === 2);
         });
     });
+    
 
     describe('array of scalar', function () {
 
