@@ -34,6 +34,69 @@ describe('ezv2', function () {
 
             assert(errors.length === 1);
         });
+        
+        
+    });
+    
+    describe('validator pipeline', function () {
+        
+        var schema = {
+            name: [
+                function (value) {
+                    if (value === undefined) {
+                        return true;
+                    }    
+                },
+                function (value) {
+                    if (typeof value !== 'string') {
+                        return 'name must be a string';
+                    }
+                }
+            ],
+            age: [
+                function (value) {
+                    if (typeof value !== 'number') {
+                        return 'age must be a number'
+                    }
+                },
+                function (value) {
+                    if (value > 100) {
+                        return 'age must be less than 100';
+                    }
+                }
+            ]
+        }
+        
+        it('should fail when age is over 100', function () {
+            var input = {
+                age: 123
+            };
+
+            errors = ezv2(input, schema);
+
+            assert(errors.length === 1, JSON.stringify(errors));
+        });
+        
+        it('should pass when name is not provided', function () {
+            var input = {
+                age: 90
+            };
+
+            errors = ezv2(input, schema);
+
+            assert(errors.length === 0, JSON.stringify(errors));
+        });
+        
+        it('should fail when name is a number', function () {
+            var input = {
+                name: 111,
+                age: 90
+            };
+
+            errors = ezv2(input, schema);
+
+            assert(errors.length === 1, JSON.stringify(errors));
+        });
     });
 
     describe('nested objects', function () {
@@ -52,7 +115,7 @@ describe('ezv2', function () {
                     return 'address must be an object'
                 }
 
-                return ezv2(value, addressSchema);
+                return addressSchema;
             }
         }
 
@@ -89,7 +152,7 @@ describe('ezv2', function () {
 
         var personSchema = {
             friends: function (value) {
-                return ezv2(value, friendSchema);
+                return friendSchema;
             }
         }
 

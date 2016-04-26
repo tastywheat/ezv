@@ -1,9 +1,9 @@
-var isPlainObject = require('lodash.isplainobject');
 var reduce = require('lodash.reduce');
-
+var isPlainObject = require('lodash.isPlainObject');
+var virtualFieldRegex = /^__.*/;
 
 function validate (source, schema, fieldPrefix) {
-    var _fieldPrefix = fieldPrefix ? (fieldPrefix + '.') : '';
+    var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix + '.') : '';
 
 
     if (typeof schema === 'function') {
@@ -44,45 +44,71 @@ function processNested (source, schema) {
 function processTop (source, schema, fieldPrefix) {
     return reduce(schema, function (errors, validator, fieldName) {
 
-        var valueToValidate = source[fieldName];
-
-        var result = validator(valueToValidate, source);
-
-        // process nested validation
-        if (isSchema(result)) {
-            var childErrors = validate(valueToValidate, result);
-            return childErrors.map(function (error) {
-                return Object.assign({}, error, {
-                    field: fieldName + '.' + error.field
+        var isVirtualField = virtualFieldRegex.test(fieldName);
+        var valueToValidate = isVirtualField ? source : source[fieldName];
+        
+        var result = processPipeline([].concat(validator), valueToValidate, source);
+        
+        switch (result.type) {
+            case 'SCHEMA':
+                var childErrors = validate(valueToValidate, result.value);
+                return childErrors.map(function (error) {
+                    return Object.assign({}, error, {
+                        field: fieldName + '.' + error.field
+                    });
+                })
+                .concat(errors);
+            
+            case 'ERROR_MESSAGE':
+                return errors.concat({
+                    field: fieldPrefix + fieldName,
+                    value: valueToValidate,
+                    message: result.value
                 });
-            })
-            .concat(errors);
-        }
-
-        // TODO: deprecate
-        // result is an array when doing nested validation
-        if (Array.isArray(result)) {
-
-            // prefix child error field with the parent's field name
-            return result.map(function (error) {
-                return Object.assign({}, error, {
-                    field: fieldName + '.' + error.field
-                });
-            })
-            .concat(errors);
-        }
-
-        if (typeof result === 'string') {
-            return errors.concat({
-                field: fieldPrefix + fieldName,
-                value: valueToValidate,
-                message: result
-            });
-        }
-
-        return errors;
-
+                
+            default:
+                return errors;
+        }   
     }, []);
+}
+
+function processPipeline (validators, valueToValidate, source) {
+    var breakEarly = false,
+        resultType,
+        resultValue;
+        
+    validators.forEach(function (validator) {
+        if (breakEarly) {
+            return;
+        }
+        
+        var result = validator(valueToValidate, source);
+        
+        switch (true) {
+            case isSchema(result):
+                resultType = 'SCHEMA';
+                resultValue = result;
+                breakEarly = true;
+                break;
+                
+            case typeof result === 'string':
+                resultType = 'ERROR_MESSAGE';
+                resultValue = result;
+                breakEarly = true;
+                break;
+                
+            case result === true:
+                resultType = 'BREAK_EARLY'
+                breakEarly = true;
+                break;
+        }
+        
+    });
+    
+    return {
+        type: resultType,
+        value: resultValue   
+    };
 }
 
 function isSchema (value) {
