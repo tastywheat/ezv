@@ -143,7 +143,7 @@ describe('ezv2', function () {
 
             errors = ezv2(input, contactSchema);
 
-            assert(errors.length === 1);
+            assert(errors.length === 1, JSON.stringify(errors));
         });
 
     });
@@ -164,7 +164,7 @@ describe('ezv2', function () {
             }
         }
 
-        it('should fail when name is not a string', function () {
+        it.only('should fail when name is not a string', function () {
 
             var input = {
                 friends: [
@@ -175,7 +175,7 @@ describe('ezv2', function () {
             }
 
             errors = ezv2(input, personSchema);
-            assert(errors.length === 2);
+            assert(errors.length === 2, JSON.stringify(errors));
         });
     });
     
@@ -206,12 +206,12 @@ describe('ezv2', function () {
             }
 
             errors = ezv2(input, personSchema);
-            assert(errors.length === 2);
+            assert(errors.length === 2, JSON.stringify(errors));
         });
     });
 
     describe('array of objects', function () {
-        it('should fail when name is not a string', function () {
+        it.only('should fail when name is not a string', function () {
             var input = [
                 { name: 'brian' },
                 { name: 123 },
@@ -227,7 +227,7 @@ describe('ezv2', function () {
             }
 
             errors = ezv2(input, schema);
-            assert(errors.length === 2);
+            assert(errors.length === 0, JSON.stringify(errors));
         });
     });
     
@@ -245,6 +245,29 @@ describe('ezv2', function () {
 
             errors = ezv2(input, schema);
             assert(errors.length === 2);
+        });
+        
+        describe('validation pipeline', function () {
+            
+            var schema = [
+                function (value) {
+                    if (typeof value !== 'number') {
+                        return 'must be a number'
+                    }
+                },
+                function (value) {
+                    if (value < 10) {
+                        return 'must be more than 10'
+                    }
+                }
+            ]
+           
+            it('should fail when value is 10 or more', function () {
+                var input = [1, 12];
+                
+                errors = ezv2(input, schema);
+                assert(errors.length === 1, JSON.stringify(errors));
+            });
         });
     })
 });

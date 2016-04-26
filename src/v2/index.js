@@ -2,82 +2,82 @@ var reduce = require('lodash.reduce');
 var isPlainObject = require('lodash.isPlainObject');
 var virtualFieldRegex = /^__.*/;
 
-function validate (source, schema, fieldPrefix) {
-    var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix + '.') : '';
-
-
-    if (typeof schema === 'function') {
-        return processScalar(source, schema);
+var DEBUG = true;
+function log (message) {
+    if (DEBUG) {
+        console.log(message);
     }
-
-    if (Array.isArray(source)) {
-        return processNested(source, schema);
-    }
-
-    return processTop(source, schema, _fieldPrefix)
 }
 
-function processScalar (source, schema) {
-    return reduce(source, function (errors, item, index) {
+function validate (source, schema, fieldPrefix) {
+    var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix + '.') : '';
+    log('Prefix: ' + _fieldPrefix);
+    
+    if (isArrayOfScalars(source)) {
+        log('Validating array of scalars');
+        return validateArrayOfScalars(source, schema, _fieldPrefix);
+    }
 
-        var result = schema(item, source);
+    if (isArrayOfObjects(source)) {
+        log('Validating array of objects');
+        return validateArrayOfObjects(source, schema, _fieldPrefix);
+    }
+    
+    if (isPlainObject(source)) {
+        log('Validating object');
+        return validateObject(source, schema, _fieldPrefix)
+    }
+}
 
-        if (typeof result === 'string') {
-            return errors.concat({
-                field: index,
-                value: item,
-                message: result
-            });
-        }
+/**
+ * Validate a list of scalar values; string, number, boolean.
+ * Iteration must be done on the source.
+ */
+function validateArrayOfScalars (source, schema, fieldPrefix) {
+    return reduce(source, function (errors, valueToValidate, index) {
+        var pipelineErrors = processPipeline(schema, valueToValidate, source, index, fieldPrefix);
+        
+        log('Scalar result: ' + pipelineErrors)
 
-        return errors;
+        return errors.concat(pipelineErrors);
     }, []);
 }
 
-function processNested (source, schema) {
-    return reduce(source, function (errors, item, index) {
-        var itemErrors = validate(item, schema, index);
+/**
+ * Validate a list of objects.
+ * Iteration must be on the source.
+ */
+function validateArrayOfObjects (source, schema, fieldPrefix) {
+    var _fieldPrefix = fieldPrefix !== undefined ? (fieldPrefix) : '';
+    
+    return reduce(source, function (errors, item, index) {    
+        var itemErrors = validate(item, schema, _fieldPrefix + index);
         return errors.concat(itemErrors);
     }, []);
 }
 
-function processTop (source, schema, fieldPrefix) {
+/**
+ * Validate a plain object.
+ * Iteration is done on the schema, which is considered the master.
+ */
+function validateObject (source, schema, fieldPrefix) {
     return reduce(schema, function (errors, validator, fieldName) {
 
         var isVirtualField = virtualFieldRegex.test(fieldName);
         var valueToValidate = isVirtualField ? source : source[fieldName];
         
-        var result = processPipeline([].concat(validator), valueToValidate, source);
+        var pipelineErrors = processPipeline(validator, valueToValidate, source, fieldName, fieldPrefix);
         
-        switch (result.type) {
-            case 'SCHEMA':
-                var childErrors = validate(valueToValidate, result.value);
-                return childErrors.map(function (error) {
-                    return Object.assign({}, error, {
-                        field: fieldName + '.' + error.field
-                    });
-                })
-                .concat(errors);
-            
-            case 'ERROR_MESSAGE':
-                return errors.concat({
-                    field: fieldPrefix + fieldName,
-                    value: valueToValidate,
-                    message: result.value
-                });
-                
-            default:
-                return errors;
-        }   
+        return errors.concat(pipelineErrors);
     }, []);
 }
 
-function processPipeline (validators, valueToValidate, source) {
-    var breakEarly = false,
-        resultType,
-        resultValue;
+function processPipeline (validators, valueToValidate, source, fieldName, fieldPrefix) {
+    var breakEarly = false;
+    var errors = [];
+    var _validators = [].concat(validators);
         
-    validators.forEach(function (validator) {
+    _validators.forEach(function (validator, index) {
         if (breakEarly) {
             return;
         }
@@ -86,29 +86,56 @@ function processPipeline (validators, valueToValidate, source) {
         
         switch (true) {
             case isSchema(result):
-                resultType = 'SCHEMA';
-                resultValue = result;
+                log('Nested schema: ' + index)
+                
+                var childErrors = validate(valueToValidate, result, fieldName);
+                errors = errors.concat(childErrors);
+                
                 breakEarly = true;
                 break;
                 
             case typeof result === 'string':
-                resultType = 'ERROR_MESSAGE';
-                resultValue = result;
+                log('Error message: ' + index)
+                
+                errors = [{
+                    field: fieldPrefix + fieldName,
+                    value: valueToValidate,
+                    message: result
+                }];
                 breakEarly = true;
                 break;
                 
             case result === true:
-                resultType = 'BREAK_EARLY'
+                log('Break early: ' + index)
+                
                 breakEarly = true;
                 break;
-        }
-        
+        } 
     });
     
-    return {
-        type: resultType,
-        value: resultValue   
-    };
+    return errors;
+}
+
+function isArrayOfObjects (source) {
+    if (!Array.isArray(source)) {
+        return false;
+    } 
+    
+    return isPlainObject(source[0]);
+}
+
+function isArrayOfScalars (source) {
+    if (!Array.isArray(source)) {
+        return false;
+    }
+    
+    var firstItem = source[0];
+    
+    return (
+        typeof firstItem === 'number' ||
+        typeof firstItem === 'string' ||
+        typeof firstItem === 'boolean'
+    );
 }
 
 function isSchema (value) {
